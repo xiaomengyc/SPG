@@ -3,6 +3,13 @@
 
 ![](figs/fig1-1.png)
 
+# Train
+
+
+
+# Test
+Download the pretrined model at GoogleDrive(https://drive.google.com/open?id=1EwRuqfGASarGidutnYB8rXLSuzYpEoSM)
+
 ![](figs/imagenet-box-1.png)
 
 ### Citation

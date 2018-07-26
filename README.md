@@ -4,11 +4,21 @@
 ![](figs/fig1-1.png)
 
 # Train
-
+We finetune the SPG model on the ILSVRC dataset.  
+```
+cd scripts
+sh train_imagenet_full_v5.sh
+```
 
 
 # Test
-Download the pretrined model at GoogleDrive(https://drive.google.com/open?id=1EwRuqfGASarGidutnYB8rXLSuzYpEoSM)
+ Download the pretrined model at GoogleDrive(https://drive.google.com/open?id=1EwRuqfGASarGidutnYB8rXLSuzYpEoSM).
+
+ Use the test script to generate attention maps.
+```
+cd scripts
+sh val_imagenet_full.sh
+```
 
 ![](figs/imagenet-box-1.png)
 

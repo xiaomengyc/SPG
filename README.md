@@ -22,6 +22,9 @@ sh val_imagenet_full.sh
 
 ![](figs/imagenet-box-1.png)
 
+### Masks are getting better with the proposed easy-to-hard approach.
+![](figs/show1-1.png)
+
 ### Citation
 If you find this code helpful, please consider to cite this paper:
 ```

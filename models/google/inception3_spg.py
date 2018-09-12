@@ -17,7 +17,7 @@ model_urls = {
 }
 
 
-def inception_v3(pretrained=False, **kwargs):
+def model(pretrained=False, **kwargs):
     r"""Inception v3 model architecture from
     `"Rethinking the Inception Architecture for Computer Vision" <http://arxiv.org/abs/1512.00567>`_.
 
@@ -188,48 +188,18 @@ class Inception3(nn.Module):
         side4 = self.side4(x)
         side4 = self.side_all(side4)
 
-        # fuse_output = (self.interp(side3)+self.interp(side4))/2.0
-        # fuse_output = self.interp(side4)
-        # self.attention = F.sigmoid(fuse_output).squeeze(dim=1)
-        #----------------------------------------------
-        # fuse_output = self.interp(torch.mean(feat, dim=1))
-        # self.attention = self.normalize_atten_maps(fuse_output)
-        # self.attention = F.sigmoid(fuse_output).squeeze(dim=1)
         #Branch 1
         out1, last_feat = self.inference(feat, label=label)
         self.map1 = out1
 
-        # atten_map = self.get_atten_map(self.interp(out1), label, normalize=True)
-        # self.attention = atten_map
-
-        # if self.onehot == 'True':
-        if True:
-            atten_map = self.get_atten_map_ml(out1, label)
-        else:
-            atten_map = self.get_atten_map(out1, label, True)
+        atten_map = self.get_atten_map(self.interp(out1), label, True)
 
         #Branch B
         out_seg = self.branchB(last_feat)
 
-        # fuse_output = self.interp(out_seg)
-        # self.attention = F.sigmoid(fuse_output).squeeze(dim=1)
-
-        # self.attention = atten_map
-        # self.attention = (atten_map + fuse_output.squeeze(dim=1))/2.0
-
-        #Saliency ===========================
-        # self.attention = F.sigmoid(out_seg).squeeze(dim=1)
-
         logits_1 = torch.mean(torch.mean(out1, dim=2), dim=2)
 
-        # mask = torch.zeros((logits_1.size()[0], 224, 224)).fill_(0.5).cuda()
-        # mask = self.get_mask(mask, atten_map)
-        # self.attention = mask
-        #----------------------------------
-
-        # return [logits_1, out_fc7_seg, mask]
         return [logits_1, side3, side4, out_seg, atten_map]
-        # return [logits_1, side3, side4, out_seg]
 
     def inference(self, x, label=None):
         x = F.dropout(x, 0.5)
@@ -248,6 +218,7 @@ class Inception3(nn.Module):
         )
 
     def mark_obj(self, label_img, heatmap, label, threshold=0.5):
+
         if isinstance(label, (float, int)):
             np_label = label
         else:
@@ -311,27 +282,6 @@ class Inception3(nn.Module):
         positions = labels.view(-1, 1) < 255.0
         return loss_func(logtis.view(-1, 1)[positions], Variable(labels.view(-1, 1)[positions]))
 
-
-    # def loss_saliency(self, logtis, labels):
-    #     positions = labels.view(-1, 1) < 255.0
-    #     weights = torch.zeros(labels.view(-1, 1)[positions].size()).cuda()
-    #     useful_labels = labels.view(-1,1)[positions]
-    #     weights[(useful_labels==1.0).long()] = 0.7
-    #     weights[(useful_labels==0.0).long()] = 0.3
-    #     return self.weighted_binary_cross_entropy(logtis.view(-1, 1)[positions],
-    #                                               Variable(useful_labels),
-    #                                               Variable(weights))
-    #
-    # def weighted_binary_cross_entropy(self, output, target, weights=None):
-    #
-    #     if weights is not None:
-    #         output = F.logsigmoid(output)
-    #         loss = weights * (target * F.logsigmoid(output)) + \
-    #                weights * ((1 - target) * F.logsigmoid(1 - output))
-    #     else:
-    #         loss = target * F.logsigmoid(output) + (1 - target) * F.logsigmoid(1 - output)
-    #
-    #     return torch.neg(torch.mean(loss))
 
     def loss_segmentation(self, loss_func, logits, labels):
         logits = logits.permute(0, 2, 3, 1).contiguous().view((-1, self.num_classes+1))
@@ -440,62 +390,6 @@ class Inception3(nn.Module):
             atten_map = self.normalize_atten_maps(atten_map)
 
         return atten_map
-
-    def get_atten_map_ml(self, feature_maps, gt_labels):
-        label = gt_labels # multilabel
-
-        feature_map_size = feature_maps.size()
-        batch_size = feature_map_size[0]
-
-        atten_map = torch.zeros([feature_map_size[0], feature_map_size[2], feature_map_size[3]])
-        atten_map = Variable(atten_map.cuda())
-        for batch_idx in range(batch_size):
-            cur_label = label[batch_idx,:]
-            cur_label = torch.unsqueeze(torch.unsqueeze(cur_label, dim=1), dim=1)
-
-            chosen_maps = feature_maps[batch_idx, :,:,:]
-            chosen_maps = self.normalize_atten_maps(chosen_maps)
-            chosen_maps = chosen_maps * cur_label
-
-            fuse_map, _ = torch.max(chosen_maps, dim=0)
-            atten_map[batch_idx,:,:] = torch.squeeze(fuse_map)
-
-        return atten_map
-
-
-    def soft_erase(self, feature_maps, atten_map,  th, omega=3, mode='fore'):
-        atten_map = F.upsample(atten_map.unsqueeze(dim=1), feature_maps.size()[2:4], mode='bilinear')
-        map_centre = atten_map - th
-
-        if mode == 'fore':
-            mask = 1 - F.sigmoid(map_centre*10.0)
-            # mask = self.refine_mask(mask,atten_map)
-            # self.attention = mask
-            # mask = 1 - F.sigmoid(mask.clamp(min=-9.0, max=9.0))
-        elif mode == 'back':
-            mask = F.sigmoid(map_centre*10.0)
-            # mask = F.sigmoid(mask.clamp(min=-9.0, max=9.0))
-        return feature_maps*mask
-
-    # def refine_mask(self, mask, map_centre):
-    #     soft_mask = torch.bernoulli(map_centre.clamp(min=0.))
-    #     # ones_mask = Variable(torch.ones(mask.size())).cuda()
-    #     # over_thred = torch.sum(mask.view(mask.size()[0], -1), dim=1) > 0.5*mask.size()[-1]*mask.size()[-1]
-    #     # over_thred = over_thred.float()
-    #     # soft_mask = soft_mask*over_thred.unsqueeze(dim=1).unsqueeze(dim=1).unsqueeze(dim=1)
-    #     # mask = ones_mask*(1-over_thred).unsqueeze(dim=1).unsqueeze(dim=1).unsqueeze(dim=1)
-    #     # return mask + soft_mask
-    #     return 1.0 - soft_mask
-
-    def refine_mask(self, mask, map_centre):
-        soft_mask = torch.bernoulli(map_centre.clamp(min=0.))
-        ones_mask = Variable(torch.ones(mask.size())).cuda()
-        over_thred = torch.sum(mask.view(mask.size()[0], -1), dim=1) > 0.5*mask.size()[-1]*mask.size()[-1]
-        over_thred = over_thred.float()
-        soft_mask = soft_mask*over_thred.unsqueeze(dim=1).unsqueeze(dim=1).unsqueeze(dim=1)
-        mask = ones_mask*(1-over_thred).unsqueeze(dim=1).unsqueeze(dim=1).unsqueeze(dim=1)
-        return mask + soft_mask
-        # return soft_mask
 
 
 class InceptionA(nn.Module):

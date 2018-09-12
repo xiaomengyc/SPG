@@ -26,31 +26,22 @@ from utils.save_atten import SAVE_ATTEN
 from utils.LoadData import data_loader2, data_loader
 from utils.Restore import restore
 
-ROOT_DIR = '/home/zhangxiaolin/xlzhang/eccv18'
-if os.uname()[1] == 'UTS-15':
-    ROOT_DIR = '/home/zhangxiaolin/xlzhang/eccv18'
-elif os.uname()[1] == 'UTS3':
-    ROOT_DIR = '/home/xiaolin/eccv18'
-elif os.uname()[1] == 'UTS2':
-    ROOT_DIR = '/home/xiaolin/xlzhang/eccv18'
+ROOT_DIR = '/'.join(os.getcwd().split('/')[:-1])
+print 'Project Root Dir:',ROOT_DIR
 
-SNAPSHOT_DIR = os.path.join(ROOT_DIR, 'snapshots', 'snapshot_bins')
+IMG_DIR=os.path.join(ROOT_DIR,'data','ILSVRC','Data','CLS-LOC','train')
+SNAPSHOT_DIR=os.path.join(ROOT_DIR,'snapshot_bins')
 
-IMG_DIR = os.path.join('/dev/shm/', 'IMAGENET_VOC_3W/imagenet_simple')
-train_list = os.path.join(ROOT_DIR, 'data', 'IMAGENET_VOC_3W', 'list', 'train.txt')
-# test_list = os.path.join(ROOT_DIR, 'data', 'IMAGENET_VOC_3W', 'list', 'test.txt')
-test_list = os.path.join(ROOT_DIR, 'data', 'IMAGENET_VOC_3W', 'list', 'train.txt')
+train_list = os.path.join(ROOT_DIR,'datalist', 'ILSVRC', 'train_list.txt')
+test_list = os.path.join(ROOT_DIR,'datalist','ILSVRC', 'val_list.txt')
 
-# IMG_DIR = os.path.join('/dev/shm/', 'VOC2012')
-# train_list = os.path.join(ROOT_DIR, 'data', 'VOC2012', 'list', 'train_softmax.txt')
-# test_list = os.path.join(ROOT_DIR, 'data', 'VOC2012', 'list', 'val_softmax.txt')
-
+# Default parameters
 LR = 0.001
-# LR=0.1
-EPOCH = 200
-DISP_INTERVAL = 50
+EPOCH = 21
+DISP_INTERVAL = 20
+
 def get_arguments():
-    parser = argparse.ArgumentParser(description='ECCV')
+    parser = argparse.ArgumentParser(description='SPG')
     parser.add_argument("--root_dir", type=str, default=ROOT_DIR)
     parser.add_argument("--img_dir", type=str, default=IMG_DIR)
     parser.add_argument("--train_list", type=str, default=train_list)

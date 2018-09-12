@@ -20,26 +20,15 @@ from utils import AverageMeter
 from utils import Metrics
 from utils.LoadData import data_loader, data_loader2
 from utils.Restore import restore
-from utils.tensorboard import writer
 
-# if os.uname()[1] == 'UTS-15':
-#     ROOT_DIR = '/home/zhangxiaolin/xlzhang/eccv18'
-# elif os.uname()[1] == 'UTS3':
-#     ROOT_DIR = '/home/xiaolin/eccv18'
-# elif os.uname()[1] == 'UTS2':
-#     ROOT_DIR = '/home/xiaolin/xlzhang/eccv18'
+ROOT_DIR = '/'.join(os.getcwd().split('/')[:-1])
+print 'Project Root Dir:',ROOT_DIR
 
-ROOT_DIR = ''.join(os.getcwd().split('/')[:-1])
-print ROOT_DIR
+IMG_DIR=os.path.join(ROOT_DIR,'data','ILSVRC','Data','CLS-LOC','train')
+SNAPSHOT_DIR=os.path.join(ROOT_DIR,'snapshot_bins')
 
-
-#SNAPSHOT_DIR = os.path.join(ROOT_DIR, 'snapshots', 'snapshot_bins')
-# IMG_DIR = os.path.join(ROOT_DIR, 'data', 'IMAGENET_VOC_3W', 'imagenet_simple')
-
-# IMG_DIR = os.path.join('/dev/shm/', 'IMAGENET_VOC_3W/imagenet_simple')
-# train_list = os.path.join(ROOT_DIR, 'data', 'IMAGENET_VOC_3W', 'list', 'train.txt')
-# test_list = os.path.join(ROOT_DIR, 'data', 'IMAGENET_VOC_3W', 'list', 'test.txt')
-
+train_list = os.path.join(ROOT_DIR,'datalist', 'ILSVRC', 'train_list.txt')
+test_list = os.path.join(ROOT_DIR,'datalist','ILSVRC', 'val_list.txt')
 
 # Default parameters
 LR = 0.001
@@ -47,7 +36,7 @@ EPOCH = 21
 DISP_INTERVAL = 20
 
 def get_arguments():
-    parser = argparse.ArgumentParser(description='ACoL')
+    parser = argparse.ArgumentParser(description='SPG')
     parser.add_argument("--root_dir", type=str, default=ROOT_DIR,
                         help='Root dir for the project')
     parser.add_argument("--img_dir", type=str, default=IMG_DIR,
@@ -144,7 +133,6 @@ def train(args):
 
             logits = model(img_var,  label_var)
             loss_val, = model.module.get_loss(logits, label_var)
-            writer.add_scalar('loss_cls', loss_val, global_counter)
 
             optimizer.zero_grad()
             loss_val.backward()

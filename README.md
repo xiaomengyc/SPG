@@ -30,7 +30,7 @@ If you find this code helpful, please consider to cite this paper:
 ```
 @inproceedings{zhang2018self,
   title={Self-produced Guidance for Weakly-supervised Object Localization},
-  author={Zhang, Xiaolin and Kang, Guoliang and Wei, Yunchao and Yang, Yi and Huang, Thomas},
+  author={Zhang, Xiaolin and Wei, Yunchao and Kang, Guoliang and Yang, Yi and Huang, Thomas},
   booktitle={European Conference on Computer Vision},
   year={2018},
   organization={Springer}

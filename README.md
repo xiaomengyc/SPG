@@ -12,7 +12,7 @@ sh train_imagenet_full_v5.sh
 
 
 # Test
- Download the pretrined model at GoogleDrive(https://drive.google.com/open?id=1EwRuqfGASarGidutnYB8rXLSuzYpEoSM).
+ Download the pretrined model at GoogleDrive(https://drive.google.com/open?id=1EwRuqfGASarGidutnYB8rXLSuzYpEoSM (IMAGENET),https://drive.google.com/open?id=1WfrELBlEoq5WO7gKUv-MLTQ8QHY-2wiX (CUB)).
 
  Use the test script to generate attention maps.
 ```

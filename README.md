@@ -1,6 +1,9 @@
 ### Self-produced Guidance for Weakly-supervised Object Localization
 
+##### Generated Object Heatmaps and Guidances
+<img width="400" height="200" src="figs/bear_loc.gif"/><img width="400" height="200" src="figs/dog_spg_c.gif"/>
 
+# Overview of SPG
 ![](figs/fig1-1.png)
 
 # Train
@@ -21,6 +24,11 @@ sh val_imagenet_full.sh
 ```
 
 ![](figs/imagenet-box-1.png)
+
+# Demo
+Thanks to [Jun Hao](https://scholar.google.com.sg/citations?user=8gm-CYYAAAAJ&hl=en) for providing the wonderful demos!
+
+Please see the [setup_demo.txt](setup_demo.txt) for more guidance of setuping up the demos.
 
 ### Masks are getting better with the proposed easy-to-hard approach.
 ![](figs/show1-1.png)

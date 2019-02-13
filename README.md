@@ -1,6 +1,7 @@
 ### Self-produced Guidance for Weakly-supervised Object Localization
 
-##### Generated Object Heatmaps and Guidances
+
+We train the SPG model on the ILSVRC dataset, and then apply the trained model on video sequences of DAVIS 2016. 
 <img width="400" height="200" src="figs/bear_loc.gif"/><img width="400" height="200" src="figs/dog_spg_c.gif"/>
 
 # Overview of SPG

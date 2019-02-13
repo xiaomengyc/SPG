@@ -1,0 +1,86 @@
+User Guide
+-----------
+Pre-requisites: Anaconda, CUDA 8.0
+
+INSTALLATION:
+--------------
+1. Create a virtual environment called 'spg' and activate it
+    conda create --name spg python=2.7 pip
+    source activate spg
+
+2. Install Pytorch
+    conda install pytorch=0.3 cuda80 torchvision -c pytorch
+
+3. Install OpenCV
+    conda install -c menpo opencv
+
+4. Install Matplotlib
+    conda install -c conda-forge matplotlib
+
+5. (Optional) Install Ipython-notebook
+    conda install ipython-notebook
+
+6. Install scikit-video and ffmpeg to write videos
+    conda install -c menpo ffmpeg
+    pip install scikit-video
+
+7. Download the pretrained model and place it under snapshots/
+
+DEMO (Single Image)
+-------------------
+demo_image.py
+Input arguments:
+    img_dir     (str): the directory where the test image is placed
+    save_dir    (str): the directory where the result is saved
+    image_name  (str): the name of the test image
+    input_size  (int): the resolution where the test image is resized to [Default: 321]
+    num_classes (int): number of classes of the pre-trained model. For model trained on ImageNet, this should be 1000.
+    snapshots   (str): the snapshot of the pretrained model [Default: 'snapshots/imagenet_epoch_2_glo_step_128118.pth.tar']
+    top_k       (int): the top-K predictions to be saved [Default: 1]
+    save_spg_c  (bool): save the prediction from SPG-C branch? [Default: True]
+
+Example 1:
+    python demo_image.py --image_name 'ILSVRC2012_val_00000004.JPEG'
+
+Example 2: save top-5 predictions
+    python demo_image.py --image_name 'ILSVRC2012_val_00000004.JPEG' --top_k 5
+
+Example 3: Save SPG-C output 
+    python demo_image.py --image_name 'ILSVRC2012_val_00000004.JPEG' --save_spg_c True
+
+Example 4: Run with different input size
+    python demo_image.py --image_name 'ILSVRC2012_val_00000004.JPEG' --top_k 5 --input_size 224
+
+**************REMARKS***************
+-------------------------------------
+1. Use '' instead of False to turn off the arguments. For example, to turn off the save_spg_c option, run the following:
+    python demo_image.py --image_name 'ILSVRC2012_val_00000004.JPEG' --save_spg_c ''
+
+
+DEMO (Video)
+-----------
+demo_video.py
+Input arguments:
+    video_dir   (str): the directory where the sequence of test images is placed
+    save_dir    (str): the directory where the result is saved
+    video_name  (str): the name of the folder of the video sequence
+    input_size  (int): the resolution where each test frame is resized to [Default: 321]
+    num_classes (int): number of classes of the pre-trained model. For model trained on ImageNet, this should be 1000.
+    snapshots   (str): the snapshot of the pretrained model [Default: 'snapshots/imagenet_epoch_2_glo_step_128118.pth.tar']
+    heatmap_type(str): there are 2 types of heatmaps to save [Default: 'loc']
+                    (1) loc: attention localization
+                    (2) spg_c: the prediction from SPG-C branch
+    include_ori (bool): show original video and heatmaps side-by-side [Default: True]
+    high_res    (bool): save as higher resolution videos [Default: False]
+
+Example 1:
+    python demo_video.py --video_name dog
+
+Example 2: Save the spg-c output instead
+    python demo_video.py --video_name dog --heatmap_type spg_c
+
+Example 3: Do not include the original videos when saving the outputs
+    python demo_video.py --video_name dog --include_ori ''
+
+Example 4: Save as higher resolution output
+    python demo_video.py --video_name dog --high_res True
